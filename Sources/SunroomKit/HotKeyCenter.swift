@@ -47,7 +47,8 @@ public final class HotKeyCenter {
     }
 
     public enum Action: String, CaseIterable, Sendable {
-        case toggleCanvas
+        case canvasMode
+        case toggleBoard
         case newNote
         case captureDesktop
     }

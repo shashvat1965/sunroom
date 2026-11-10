@@ -117,3 +117,42 @@ public enum SampleCanvas {
         return document
     }
 }
+
+// MARK: - Canvas mode illustration
+
+public extension SampleCanvas {
+    /// A stand-in for the live canvas: the same window cards the desktop plane
+    /// draws, laid out the way canvas mode arranges real windows. Used for
+    /// documentation where a real permission grant is not available.
+    static func canvasModeIllustration() -> CanvasDocument {
+        var document = CanvasDocument(name: "Canvas mode", background: .midnight, gridStyle: .dots, gridSpacing: 44)
+
+        let specifications: [(String, String, String, Double, Double, Double, Double)] = [
+            ("Safari", "Design notes — Safari", "com.apple.Safari", -700, -420, 620, 400),
+            ("Xcode", "Sunroom — Sources", "com.apple.dt.Xcode", 20, -470, 700, 470),
+            ("Terminal", "sunroom — swift build", "com.apple.Terminal", 800, -360, 520, 320),
+            ("Notes", "Launch checklist", "com.apple.Notes", -660, 60, 460, 340),
+            ("Music", "Focus — playlist", "com.apple.Music", -120, 90, 520, 310),
+            ("Finder", "Sunroom", "com.apple.finder", 480, 120, 480, 330)
+        ]
+
+        for (app, title, bundle, x, y, width, height) in specifications {
+            let node = CanvasNode(
+                kind: .window,
+                frame: CanvasRect(x: x, y: y, width: width, height: height),
+                title: title,
+                text: app,
+                style: NodeStyle(accent: ColorToken.slate.rawValue, cornerRadius: 12),
+                windowReference: WindowReference(
+                    windowNumber: 0,
+                    ownerPID: 0,
+                    bundleIdentifier: bundle,
+                    appName: app,
+                    windowTitle: title
+                )
+            )
+            document.insert(node)
+        }
+        return document
+    }
+}

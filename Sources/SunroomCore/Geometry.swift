@@ -128,8 +128,11 @@ public struct CanvasRect: Codable, Hashable, Sendable {
     public var height: Double { abs(size.height) }
 
     public var center: CanvasPoint {
-        CanvasPoint(x: (minX + maxX) / 2, y: (minY + maxY) / 2)
+        CanvasPoint(x: minX + width / 2, y: minY + height / 2)
     }
+
+    public var midX: Double { minX + width / 2 }
+    public var midY: Double { minY + height / 2 }
 
     public var standardized: CanvasRect {
         CanvasRect(x: minX, y: minY, width: width, height: height)

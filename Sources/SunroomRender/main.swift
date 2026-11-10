@@ -78,6 +78,9 @@ func main() {
         index += 1
     }
 
+    let canvasMode = SampleCanvas.canvasModeIllustration()
+    _ = render(document: canvasMode, to: "\(outputDirectory)/canvas-mode.png", scale: 2, padding: 120, dark: true)
+
     var welcome = SampleCanvas.welcome()
     welcome.transform = .identity
     _ = render(document: welcome, to: "\(outputDirectory)/hero.png", scale: 2, padding: 120, dark: false)

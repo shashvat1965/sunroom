@@ -307,15 +307,50 @@ avoids a visible jump), and returns whether each attribute was accepted. Long op
 move — run on a dedicated serial queue, never the main thread, and report completion back on the main actor. A failed
 write degrades to "cannot move this window" and surfaces a toast; it never retries forever.
 
-**Choreography, not a compositor.** Public macOS APIs cannot composite another app's window into your own view, so
-Sunroom cannot be a compositor-level plane like phantomat on Hyprland. The canvas is the planner and the desktop is the
-output: **Capture desktop** builds cards that mirror the current window layout, and **Apply layout to desktop** moves
-the real windows into the cards' positions with an eased tween. Windows keep their own rendering, input and frame rate
-throughout.
+**Choreography, not a compositor.** macOS refuses compositor transforms for windows an app does not own. We verified
+this on macOS 26: `CGSSetWindowTransform` (SkyLight) applies and reads back for our own windows, but on a foreign window
+it returns success and silently does nothing. The check is server-side, keyed to the sending mach port, and the only
+bypass is Apple's private `universal-owner` entitlement or a SIP-disabled system. Canvas mode therefore moves and
+resizes real windows through Accessibility. Content reflows when windows shrink, and the camera clamps at roughly a
+third because apps enforce their own minimum sizes. In exchange the windows stay live and interactive, with no screen
+capture at all.
 
 **Scope.** Sunroom touches only windows the user explicitly put on a canvas. It does not enumerate-and-tile everything
 it can see, does not send keystrokes, does not press buttons, and does not read window text content beyond the title
 needed to label a card.
+
+## Canvas mode (the desktop plane)
+
+Canvas mode is a separate layer from boards. It has no document UI: it owns the real desktop for as long as the mode is
+on.
+
+**The plane.** `SunroomCore.DesktopCanvas` defines the model: `PlaneWindow` (identity, window number, pid, plane frame,
+original frame), `PlaneLayout`, `TileZone` and `PlaneLayoutEngine`. Plane units are screen points at 100% zoom with the
+origin at the top-left of the primary display, so a window's current frame is already a valid plane rect. The camera is
+the same `CanvasTransform` the boards use, which means panning and zooming are one multiply-add away from a screen rect.
+
+**Entering.** The controller asks `WindowDiscovery` for manageable windows and keeps only those whose centre is on the
+display under the pointer. It captures each window's original AppKit frame for restoration, then resolves a plane frame:
+the remembered position for that `bundleIdentifier|title` key if one exists, otherwise a parking spot to the right of the
+existing cluster. The camera fits the union of all plane frames with 64 points of padding, clamped to a 0.34 floor and
+1.0 ceiling.
+
+**Applying.** Each window's target screen rect is `camera.screenRect(planeFrame)`, clamped so at least 160×110 points
+stay on screen. Frames are converted to AppKit's bottom-left global space and written through the Accessibility API on a
+background queue. During a pan or drag, batches are coalesced to at most one every 30 ms and superseded rather than
+queued, so the window server never receives a backlog of stale layouts.
+
+**Input.** Two windows do the chrome: a borderless surface at `desktopWindow + 1` draws the plane behind the apps, and a
+transparent overlay at `screenSaver` level takes the pointer and trackpad above them. The overlay hit-tests plane frames
+in canvas space, so panning and zooming change the mapping without touching the windows. A click without a drag dives
+into a window; a drag moves it and previews a tile zone; releasing on an edge or on another window commits the layout.
+
+**Leaving.** `Esc` re-animates every window to the frame captured at entry. `⌃⌥Space` from a focused window returns to the
+plane instead. The mode is idempotent: a second exit is a no-op, and windows that closed while the plane was up are
+skipped by the AX lookup.
+
+**What is remembered.** Plane positions persist in `plane-layout.json`, not in a board document. The desktop layout is
+per-machine state; boards are portable documents.
 
 ## Concurrency
 

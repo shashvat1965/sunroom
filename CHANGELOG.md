@@ -6,6 +6,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is below 1.0, minor releases may include
 breaking changes to the document schema; those changes always ship with a migration.
 
+## [0.2.0] - 2026-11-10
+
+Canvas mode: the desktop as one plane of live windows.
+
+### Added
+
+- **Canvas mode.** `⌃⌥Space` gathers the windows on the current display, keeps their arrangement and zooms out until
+  everything fits. Two-finger pan, pinch zoom, double-tap to fit.
+- **Click to go in.** A window animates to fill the screen and its app comes forward; `⌃⌥Space` returns to the plane.
+- **Drag to arrange.** Move windows on the plane, drop one on another to stack it, or on a screen edge to tile to that
+  half or quarter, with a live preview of the target.
+- **Keyboard navigation.** Arrows select the nearest window, `↩` goes in, `Tab` cycles, `F` fits, `Esc` restores the
+  desktop exactly as it was.
+- **Per-display planes.** Only the display you invoke canvas mode on is gathered; other screens are untouched.
+  Window positions are remembered per app and title in `plane-layout.json`.
+- **A separate plane engine in Core.** Fitting zoom, camera solving, normalise/park/stack layout, directional
+  navigation and tile geometry, with 23 new tests.
+- **Overlay windows.** A desktop-level surface for the canvas and a screen-saver-level transparent overlay that owns
+  the pointer while canvas mode is on.
+
+### Changed
+
+- The README now leads with canvas mode and describes boards as the secondary surface.
+- The global `⌥Space` hot key now summons the boards window; `⌃⌥Space` is canvas mode.
+
+### Notes
+
+- macOS refuses compositor transforms for windows an app does not own (`CGSSetWindowTransform` returns success but
+  silently no-ops; the check is server-side and keyed to the mach port). Canvas mode therefore moves and resizes real
+  windows through Accessibility: content reflows at zoom, and zoom clamps at roughly one third because apps enforce
+  minimum sizes. This is documented in the README and the architecture notes.
+
 ## [Unreleased]
 
 ### Added

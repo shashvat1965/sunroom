@@ -95,6 +95,7 @@ public final class AppModel: ObservableObject {
     public let ax: AccessibilityWindowController
     public let capture: WindowCaptureService
     public let hotKeys: HotKeyCenter
+    public let canvasMode: CanvasModeController
 
     private let undoStack = UndoStack()
     private var autosave: AutosaveController?
@@ -115,9 +116,11 @@ public final class AppModel: ObservableObject {
         self.store = store
         self.settingsStore = settingsStore
         self.windowDiscovery = WindowDiscovery()
-        self.ax = AccessibilityWindowController()
         self.capture = WindowCaptureService()
         self.hotKeys = HotKeyCenter()
+        let axController = AccessibilityWindowController()
+        self.ax = axController
+        self.canvasMode = CanvasModeController(ax: axController)
         let loadedSettings = settingsStore.load()
         self.settings = loadedSettings
 
@@ -1081,7 +1084,8 @@ public final class AppModel: ObservableObject {
 
     private func configureHotKeys() {
         var bindings: [HotKeyCenter.Action: HotKeyCenter.Combo] = [
-            .toggleCanvas: settings.hotKey,
+            .canvasMode: .controlOptionSpace,
+            .toggleBoard: settings.hotKey,
             .newNote: HotKeyCenter.Combo(keyCode: 45, modifiers: UInt32(1 << 11) | UInt32(1 << 8)) // ⌃⌥N
         ]
         bindings[.captureDesktop] = nil
@@ -1089,13 +1093,30 @@ public final class AppModel: ObservableObject {
         hotKeys.onAction = { [weak self] action in
             guard let self else { return }
             switch action {
-            case .toggleCanvas:
+            case .canvasMode:
+                self.toggleCanvasMode()
+            case .toggleBoard:
                 self.toggleWindowVisibility()
             case .newNote:
                 self.addNote()
             case .captureDesktop:
                 self.captureDesktop()
             }
+        }
+    }
+
+    public func toggleCanvasMode() {
+        guard hasAccessibility else {
+            refreshPermissions()
+            requestPermission(.accessibility)
+            showToast("Allow Accessibility to put your windows on a canvas", systemImage: "hand.raised", isError: true)
+            return
+        }
+        canvasMode.toggle()
+        if canvasMode.phase == .off {
+            WindowRegistry.mainWindow?.makeKeyAndOrderFront(nil)
+        } else {
+            WindowRegistry.mainWindow?.orderOut(nil)
         }
     }
 

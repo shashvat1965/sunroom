@@ -11,7 +11,8 @@ What has been verified, how, and what is still unverified. Updated with each rel
 | Layout, level of detail, minimap, search | 48 tests | `swift test` |
 | Sample canvas, performance budgets | 19 tests | `swift test` |
 | Kit: desktop mapping, coordinate conversion, settings, store | 21 tests | `swift test` |
-| **Total** | **301 tests, headless, ~1 s** | |
+| Desktop plane: fitting, camera, layout, tiling, navigation | 23 tests | `swift test` |
+| **Total** | **324 tests, headless, ~1 s** | |
 
 The Core suite is platform-free, so it runs on any Mac and in CI without a window
 server, a display or a TCC prompt.
@@ -52,6 +53,20 @@ onboarding, window library, search state, inline editing, five backgrounds.
   from the permission UI.
 - Snapshot mode is idempotent and quits cleanly.
 - `swift build -c release`, `swift test`, `make app`, `make release` all succeed.
+
+## Canvas mode (0.2)
+
+Verified by tests and by construction, **not yet by eye on this machine**:
+
+- Plane fitting, camera solving, normalise/park/stack, directional navigation and tile geometry are unit tested.
+- The AX arrival path compiles against real window elements, but no Accessibility grant was available in the build
+  environment, so the first live run is the user's.
+- Window-restore is best-effort by design: frames captured at entry are re-applied on exit; a window that closed is
+  skipped.
+- The overlay uses `screenSaver` level and the surface `desktopWindow + 1`; both are standard public window levels.
+
+What to check on a granted machine: `⌃⌥Space` gathers only the current display; pinch keeps the point under the cursor
+still; clicking goes in and back; dragging to an edge tiles; `Esc` restores every window to its starting frame.
 
 ## Not verified yet
 

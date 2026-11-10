@@ -81,6 +81,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         if let model {
             model.startCapture()
+            if ProcessInfo.processInfo.arguments.contains("--canvas-mode") {
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 1_200_000_000)
+                    model.toggleCanvasMode()
+                }
+            }
             if model.launchOptions.snapshotDirectory != nil {
                 Task { @MainActor in
                     // The main window is created by SwiftUI shortly after this.
@@ -117,6 +123,9 @@ struct MenuBarContent: View {
     @ObservedObject var model: AppModel
 
     var body: some View {
+        Button(model.canvasMode.phase == .off ? "Put Windows on a Canvas  ⌃⌥Space" : "Leave Canvas Mode  ⌃⌥Space") {
+            model.toggleCanvasMode()
+        }
         Button("Open Sunroom") {
             NSApp.activate(ignoringOtherApps: true)
             WindowRegistry.mainWindow?.makeKeyAndOrderFront(nil)
@@ -215,6 +224,16 @@ struct SunroomCommands: Commands {
         }
 
         CommandMenu("Canvas") {
+            Button(model.canvasMode.phase == .off ? "Put Windows on a Canvas" : "Leave Canvas Mode") {
+                model.toggleCanvasMode()
+            }
+            .keyboardShortcut(" ", modifiers: [.control, .option])
+            Button("Back to Canvas") { model.canvasMode.surface() }
+                .keyboardShortcut(" ", modifiers: [.control, .option, .shift])
+                .disabled(!model.canvasMode.isFocused)
+            Button("Fit All Windows") { model.canvasMode.fitAll() }
+                .disabled(model.canvasMode.phase != .canvas)
+            Divider()
             Button("Command Palette…") { model.isPalettePresented = true }
                 .keyboardShortcut("k", modifiers: .command)
             Button("Search Canvas…") { model.isPalettePresented = true }

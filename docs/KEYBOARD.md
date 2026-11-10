@@ -11,6 +11,31 @@ Conventions:
   text field. App-level shortcuts such as `⌘K` still work.
 - Arrow-key nudging and Delete apply to the current selection, never to the text cursor.
 
+## Canvas mode
+
+Canvas mode puts every window on the current display on one plane. It is the headline interaction, so it has the
+shortest keys.
+
+| Shortcut | Action |
+| --- | --- |
+| `⌃⌥Space` | Put the windows on a canvas / return to the canvas / leave canvas mode |
+| `⌃⌥⇧Space` | Back to the zoomed-out plane from a focused window |
+| `Esc` | Leave canvas mode and restore every window to its original frame |
+| `F` | Fit every window on the plane |
+| `↑ ↓ ← →` | Select the nearest window in that direction |
+| `↩` | Go into the selected window (fills the screen) |
+| `Tab` / `⇧Tab` | Cycle the selection |
+| Two-finger scroll | Pan the plane |
+| Pinch | Zoom around the pointer (clamped to the app minimums) |
+| Double-tap | Fit everything |
+| Drag a window | Move it on the plane |
+| Drop on a screen edge | Tile: left, right, top, bottom or a quarter |
+| Drop on another window | Stack it, offset like a paper pile |
+| `⌥` + scroll | Zoom with a mouse |
+
+While canvas mode is on, a transparent overlay above every window owns the pointer; apps below do not receive clicks
+until you go into one. `Esc` or `⌃⌥Space` gives the desktop back exactly as it was.
+
 ## App
 
 | Shortcut | Action |
