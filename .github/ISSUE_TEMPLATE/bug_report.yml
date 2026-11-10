@@ -1,0 +1,138 @@
+name: Bug report
+description: Something in Sunroom is broken, crashes, or does not match the documentation.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        **Please do not report security issues here.** Follow the [security policy](https://github.com/shashvat1965/sunroom/blob/main/SECURITY.md) instead.
+
+        Before filing, search the existing issues and check that you are on the latest `main` or release.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and how it affected your work.
+      placeholder: I placed a Safari window, zoomed out, and the card stayed at full size...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Number the steps. Include the smallest canvas or file that shows the problem.
+      placeholder: |
+        1. Open a new canvas
+        2. Press ⇧⌘W and place Safari
+        3. Zoom to 40%
+        4. The card does not switch to compact detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      placeholder: The card should show its title without the live snapshot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include any error message, crash report text, or a screenshot if it helps.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: macos
+    attributes:
+      label: macOS version
+      options:
+        - macOS 14 (Sonoma)
+        - macOS 15 (Sequoia)
+        - macOS 26 (Tahoe)
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: chip
+    attributes:
+      label: Mac
+      options:
+        - Apple silicon
+        - Intel
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install Sunroom?
+      options:
+        - Built from source (make app)
+        - GitHub release build
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Sunroom version or commit
+      description: The version from Settings, or the output of `git rev-parse --short HEAD`.
+      placeholder: 0.1.0 (a1b2c3d)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: accessibility
+    attributes:
+      label: Accessibility permission
+      options:
+        - Granted
+        - Denied / not granted
+        - Not requested yet
+        - Not applicable to this bug
+    validations:
+      required: true
+
+  - type: dropdown
+    id: screen-recording
+    attributes:
+      label: Screen Recording permission
+      options:
+        - Granted
+        - Denied / not granted
+        - Not requested yet
+        - Not applicable to this bug
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or crash report
+      description: Optional. Remove note text, window titles, file paths and anything else private before pasting.
+      render: shell
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and this is not a duplicate.
+          required: true
+        - label: I removed private information from screenshots, logs and canvas excerpts.
+          required: true
+        - label: I understand Sunroom is pre-1.0 and some features are still in progress.
+          required: true

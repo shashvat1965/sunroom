@@ -1,0 +1,29 @@
+# Normalize text files to LF in the repository, regardless of platform.
+* text=auto eol=lf
+
+# Source and configuration
+*.swift   text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.json    text eol=lf
+Makefile  text eol=lf
+.editorconfig text eol=lf
+.gitignore    text eol=lf
+
+# Binary assets
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.icns    binary
+*.pdf     binary
+*.zip     binary
+*.app     binary
+
+# Keep screenshots and documentation images out of language statistics.
+docs/images/* linguist-documentation
+
+# Generated bundles are build output, not source.
+dist/* linguist-generated

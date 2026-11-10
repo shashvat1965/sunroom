@@ -1,0 +1,71 @@
+name: Feature request
+description: Propose a capability, a change in behaviour, or a papercut worth fixing.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good feature requests start with a problem, not a solution. Describe what you are trying to do and where
+        Sunroom gets in the way. Check the [roadmap](https://github.com/shashvat1965/sunroom/blob/main/docs/ROADMAP.md)
+        first — it may already be planned, or deliberately out of scope.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: The situation, how often it happens, and what you do today instead.
+      placeholder: Every Monday I arrange the same four windows for a review. I rebuild the layout by hand and lose it when I quit.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like Sunroom to do?
+      description: A concrete interaction is more useful than a category. Keyboard shortcuts and edge cases welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have considered
+      description: Other apps, workarounds, or a smaller version of the idea.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Canvas and navigation
+        - Windows and capture
+        - Organizing and layout
+        - Keyboard and commands
+        - Craft, visual design and accessibility
+        - Documentation or build
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you be willing to help?
+      options:
+        - Yes, I can open a pull request
+        - Yes, with some guidance
+        - No, I am reporting the idea only
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and the roadmap for this idea.
+          required: true
+        - label: This request does not require an account, a server, or sending canvas data off the Mac.
+          required: true

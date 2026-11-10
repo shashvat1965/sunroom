@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the documentation
+    url: https://github.com/shashvat1965/sunroom#readme
+    about: Build instructions, features, architecture and the keyboard reference.
+  - name: Check the roadmap
+    url: https://github.com/shashvat1965/sunroom/blob/main/docs/ROADMAP.md
+    about: What is planned, what is not, and why. Please look here before requesting a feature.
+  - name: Report a security vulnerability
+    url: https://github.com/shashvat1965/sunroom/security/policy
+    about: Private reporting only. Do not open a public issue for security problems.

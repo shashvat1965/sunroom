@@ -1,0 +1,74 @@
+# SwiftLint configuration for a SwiftUI + AppKit macOS app.
+#
+# The goal is signal, not ceremony. Rules that fight SwiftUI's view builders or
+# the geometry code are disabled deliberately rather than silenced inline.
+
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+  - dist
+  - Resources
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_interpolated_strings: true
+  ignores_function_declarations: false
+
+function_parameter_count:
+  warning: 6
+  error: 9
+
+type_name:
+  min_length: 3
+  max_length: 50
+
+identifier_name:
+  min_length: 1
+  max_length: 50
+  excluded:
+    - id
+    - x
+    - y
+    - dx
+    - dy
+    - t
+    - a
+    - b
+
+disabled_rules:
+  # SwiftUI view builders read as one expression; these rules fight that style.
+  - multiple_closures_with_trailing_closure
+  - nesting
+  - large_tuple
+  # Geometry and math read better with explicit branches than with `where`.
+  - for_where
+  # Documentation and cleanup are reviewed by humans; TODO is allowed pre-1.0.
+  - todo
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - last_where
+  - sorted_imports
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - yoda_condition
+
+analyzer_rules:
+  - unused_import
+
+trailing_whitespace:
+  ignores_empty_lines: true
+
+vertical_whitespace:
+  max_empty_lines: 1
+
+reporter: "xcode"
