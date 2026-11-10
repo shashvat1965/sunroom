@@ -256,7 +256,7 @@ public struct CanvasDocument: Codable, Identifiable, Hashable, Sendable {
         self.transform = transform
         self.background = background
         self.gridStyle = gridStyle
-        self.gridSpacing = max(8, gridSpacing)
+        self.gridSpacing = max(16, gridSpacing)
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.notes = notes
@@ -372,5 +372,81 @@ public enum ColorToken: String, Codable, CaseIterable, Sendable {
         case .slate: return "Slate"
         case .graphite: return "Graphite"
         }
+    }
+}
+
+// MARK: - Tolerant decoding
+//
+// Documents are user data. A field added in a later version — or removed in a
+// refactor — must never make an older file unreadable, so every key is decoded
+// with `decodeIfPresent` and falls back to a sensible default. Without this,
+// `migrateIfNeeded()` could never run, because decoding would throw first.
+
+extension CanvasDocument {
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion, id, name, nodes, transform, background, gridStyle, gridSpacing, createdAt, updatedAt, notes
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            id: try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID(),
+            name: try container.decodeIfPresent(String.self, forKey: .name) ?? "Untitled Canvas",
+            nodes: try container.decodeIfPresent([CanvasNode].self, forKey: .nodes) ?? [],
+            transform: try container.decodeIfPresent(CanvasTransform.self, forKey: .transform) ?? .identity,
+            background: try container.decodeIfPresent(CanvasBackground.self, forKey: .background) ?? .aurora,
+            gridStyle: try container.decodeIfPresent(GridStyle.self, forKey: .gridStyle) ?? .dots,
+            gridSpacing: try container.decodeIfPresent(Double.self, forKey: .gridSpacing) ?? 48,
+            createdAt: try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date(),
+            updatedAt: try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date(),
+            notes: try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
+        )
+        self.schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion) ?? Self.currentSchemaVersion
+    }
+}
+
+extension CanvasNode {
+    enum CodingKeys: String, CodingKey {
+        case id, kind, frame, title, text, style, linkURL, imageAssetName, windowReference, groupID
+        case isLocked, isCollapsed, createdAt, updatedAt
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            id: try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID(),
+            kind: try container.decodeIfPresent(NodeKind.self, forKey: .kind) ?? .note,
+            frame: try container.decodeIfPresent(CanvasRect.self, forKey: .frame) ?? CanvasRect(x: 0, y: 0, width: 240, height: 160),
+            title: try container.decodeIfPresent(String.self, forKey: .title) ?? "",
+            text: try container.decodeIfPresent(String.self, forKey: .text) ?? "",
+            style: try container.decodeIfPresent(NodeStyle.self, forKey: .style) ?? .default,
+            linkURL: try container.decodeIfPresent(String.self, forKey: .linkURL),
+            imageAssetName: try container.decodeIfPresent(String.self, forKey: .imageAssetName),
+            windowReference: try container.decodeIfPresent(WindowReference.self, forKey: .windowReference),
+            groupID: try container.decodeIfPresent(UUID.self, forKey: .groupID),
+            isLocked: try container.decodeIfPresent(Bool.self, forKey: .isLocked) ?? false,
+            isCollapsed: try container.decodeIfPresent(Bool.self, forKey: .isCollapsed) ?? false,
+            createdAt: try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date(),
+            updatedAt: try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
+        )
+    }
+}
+
+extension NodeStyle {
+    enum CodingKeys: String, CodingKey {
+        case accent, fill, textColor, fontSize, cornerRadius, opacity, imageContentMode
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            accent: try container.decodeIfPresent(String.self, forKey: .accent) ?? ColorToken.sunflower.rawValue,
+            fill: try container.decodeIfPresent(String.self, forKey: .fill),
+            textColor: try container.decodeIfPresent(String.self, forKey: .textColor),
+            fontSize: try container.decodeIfPresent(Double.self, forKey: .fontSize) ?? 15,
+            cornerRadius: try container.decodeIfPresent(Double.self, forKey: .cornerRadius) ?? 18,
+            opacity: try container.decodeIfPresent(Double.self, forKey: .opacity) ?? 1,
+            imageContentMode: try container.decodeIfPresent(String.self, forKey: .imageContentMode) ?? "fit"
+        )
     }
 }

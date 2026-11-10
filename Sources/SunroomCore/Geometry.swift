@@ -166,7 +166,13 @@ public struct CanvasRect: Codable, Hashable, Sendable {
     }
 
     public func insetBy(_ amount: Double) -> CanvasRect {
-        CanvasRect(x: minX + amount, y: minY + amount, width: max(0, width - amount * 2), height: max(0, height - amount * 2))
+        let newWidth = width - amount * 2
+        let newHeight = height - amount * 2
+        if newWidth <= 0 || newHeight <= 0 {
+            // Collapse around the centre rather than keeping a shifted origin.
+            return CanvasRect(origin: center, size: .zero)
+        }
+        return CanvasRect(x: minX + amount, y: minY + amount, width: newWidth, height: newHeight)
     }
 
     public func expandedBy(_ amount: Double) -> CanvasRect {

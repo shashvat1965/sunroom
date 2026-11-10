@@ -36,5 +36,10 @@ let package = Package(
             dependencies: ["SunroomCore"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
+        .testTarget(
+            name: "SunroomKitTests",
+            dependencies: ["SunroomKit"],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
     ]
 )

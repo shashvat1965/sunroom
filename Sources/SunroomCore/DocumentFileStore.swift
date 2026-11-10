@@ -175,8 +175,13 @@ public final class DocumentFileStore {
     // MARK: Backups
 
     private func backup(_ url: URL, canvasID: UUID) {
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let destination = location.backupsDirectory.appendingPathComponent("\(canvasID.uuidString)-\(stamp).json")
+        // Fractional seconds plus a short suffix: several saves inside one
+        // second must never collide into a single backup file.
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let stamp = formatter.string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let suffix = UUID().uuidString.prefix(4)
+        let destination = location.backupsDirectory.appendingPathComponent("\(canvasID.uuidString)-\(stamp)-\(suffix).json")
         try? fileManager.copyItem(at: url, to: destination)
         pruneBackups(for: canvasID)
     }

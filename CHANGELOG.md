@@ -67,7 +67,7 @@ Glass interface and the full keyboard model all ship together.
 - **Colour tokens** stored by name rather than hex, so themes and accessibility passes do not require a document
   migration.
 - **Sample canvas** for first launch and previews.
-- **285 headless tests** across geometry, transform, spatial index, snapping, document operations, undo, persistence,
+- **301 headless tests** across geometry, transform, spatial index, snapping, document operations, undo, persistence,
   layout, search and the sample canvas.
 - **MIT licence.**
 

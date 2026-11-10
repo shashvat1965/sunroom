@@ -58,6 +58,17 @@ public struct RootView: View {
                 }
             }
 
+            if model.isSearchFocused || !model.searchQuery.isEmpty {
+                VStack {
+                    CanvasSearchBar(model: model)
+                        .padding(.top, 74)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .zIndex(12)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
             if let editingID = model.editingNodeID,
                let node = model.document.node(withID: editingID),
                node.kind.isTextual {
@@ -422,34 +433,39 @@ struct TextEditingOverlay: View {
         model.camera.screenRect(fromCanvas: node.frame).cgRect
     }
 
+
+
     var body: some View {
         let rect = screenRect
         let scale = max(0.25, min(1.4, model.camera.zoom))
-        VStack(alignment: .leading, spacing: 0) {
-            if node.kind == .note {
-                TextField("Title", text: $titleDraft)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15 * scale, weight: .semibold))
-                    .padding(.bottom, 6)
-            }
-            TextEditor(text: $draft)
-                .scrollContentBackground(.hidden)
-                .font(.system(size: node.style.fontSize * scale))
-                .focused($focused)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .padding(16)
-        .frame(width: max(160, rect.width), height: max(90, rect.height))
-        .background {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.regularMaterial)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(Color.sunroomAccent.opacity(0.8), lineWidth: 1.2)
+        GeometryReader { _ in
+            VStack(alignment: .leading, spacing: 0) {
+                if node.kind == .note {
+                    TextField("Title", text: $titleDraft)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 15 * scale, weight: .semibold))
+                        .padding(.bottom, 6)
                 }
-                .shadow(color: .black.opacity(0.18), radius: 18, y: 8)
+                TextEditor(text: $draft)
+                    .scrollContentBackground(.hidden)
+                    .font(.system(size: node.style.fontSize * scale))
+                    .focused($focused)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .padding(16)
+            .frame(width: max(160, rect.width), height: max(90, rect.height))
+            .background {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.regularMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(Color.sunroomAccent.opacity(0.85), lineWidth: 1.4)
+                    }
+                    .shadow(color: .black.opacity(0.20), radius: 20, y: 9)
+            }
+            .offset(x: rect.minX, y: rect.minY)
         }
-        .position(x: rect.midX, y: rect.midY)
+        .ignoresSafeArea()
         .onAppear {
             draft = node.text
             titleDraft = node.title
@@ -459,12 +475,15 @@ struct TextEditingOverlay: View {
             if !isFocused { commit() }
         }
         .onExitCommand { commit() }
+        .onDisappear { commit() }
     }
 
     private func commit() {
-        guard model.editingNodeID == node.id else { return }
+        guard model.document.node(withID: node.id) != nil else { return }
         model.commitTextEdit(nodeID: node.id, title: titleDraft, text: draft)
-        model.editingNodeID = nil
+        if model.editingNodeID == node.id {
+            model.editingNodeID = nil
+        }
     }
 }
 
@@ -542,5 +561,67 @@ struct ShortcutSheet: View {
             .frame(width: 760)
             .glassPanel(cornerRadius: 22)
         }
+    }
+}
+
+
+// MARK: - Canvas search
+
+/// Lightweight find bar for the "type anywhere" search. It floats above the
+/// canvas, filters objects live, and steps through matches with Return.
+struct CanvasSearchBar: View {
+    @ObservedObject var model: AppModel
+    @FocusState private var focused: Bool
+
+    private var hits: [NodeSearchHit] {
+        model.document.search(model.searchQuery)
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            TextField("Find on this canvas", text: $model.searchQuery)
+                .textFieldStyle(.plain)
+                .font(.system(size: 12.5))
+                .focused($focused)
+                .frame(width: 220)
+                .onSubmit { jumpToFirst() }
+
+            if !model.searchQuery.isEmpty {
+                Text("\(hits.count)")
+                    .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 1.5)
+                    .background(Capsule().fill(Color.primary.opacity(0.07)))
+            }
+
+            KeyCap("esc")
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 34)
+        .glassPanel(cornerRadius: 12, shadow: true)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { focused = true }
+        }
+        .onExitCommand {
+            model.searchQuery = ""
+            model.isSearchFocused = false
+            focused = false
+        }
+        .onChange(of: focused) { _, isFocused in
+            if !isFocused && model.searchQuery.isEmpty {
+                model.isSearchFocused = false
+            }
+        }
+    }
+
+    private func jumpToFirst() {
+        guard let first = hits.first else { return }
+        model.centerOnNode(id: first.node.id)
+        model.selection = [first.node.id]
     }
 }

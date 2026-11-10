@@ -332,7 +332,7 @@ The rule of thumb: the main thread may wait for a value, but never for the windo
 
 ## Testing strategy
 
-Core tests are deterministic and headless — 285 assertions across twelve files, run in under a second. Every Core
+Core tests are deterministic and headless — 301 assertions across twelve files, run in under a second. Every Core
 change is expected to bring its own:
 
 - Transform round-trips at the zoom extremes and at non-integer anchors.

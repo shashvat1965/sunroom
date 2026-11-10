@@ -41,7 +41,7 @@ public enum SampleCanvas {
 
         let frame = CanvasNode(
             kind: .group,
-            frame: CanvasRect(x: -660, y: -70, width: 1040, height: 244),
+            frame: CanvasRect(x: -660, y: -70, width: 1084, height: 244),
             title: "A little tour",
             style: NodeStyle(accent: ColorToken.slate.rawValue, cornerRadius: 26)
         )

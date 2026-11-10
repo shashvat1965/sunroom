@@ -211,12 +211,7 @@ final class SpatialIndexTests: XCTestCase {
 
         XCTAssertEqual(index.ids(containing: pt(1, 1)), [id], "Origin cell still works")
 
-        XCTExpectFailure(
-            "Known bug: a rect spanning >= 4096 cells is stored in a single origin cell.",
-            strict: false
-        ) {
-            XCTAssertEqual(index.ids(intersecting: rect(100_000, 100_000, 10, 10)), [id])
-        }
+        XCTAssertEqual(index.ids(intersecting: rect(100_000, 100_000, 10, 10)), [id])
     }
 
     // MARK: Nearest
@@ -256,11 +251,6 @@ final class SpatialIndexTests: XCTestCase {
         let id = UUID()
         index.insert(id: id, rect: rect(0, 0, 10, 10))
 
-        XCTExpectFailure(
-            "Known bug: nearest() with a large maxDistance scans a single cell.",
-            strict: false
-        ) {
-            XCTAssertEqual(index.nearest(to: pt(5, 5), limit: 1, maxDistance: 1e9), [id])
-        }
+        XCTAssertEqual(index.nearest(to: pt(5, 5), limit: 1, maxDistance: 1e9), [id])
     }
 }

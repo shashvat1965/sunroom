@@ -23,11 +23,11 @@ public extension CanvasDocument {
         return newNode.id
     }
 
-    /// Inserts a node in front of everything except containers.
+    /// Inserts a node on top of everything else. Containers are painted first
+    /// regardless of array position, so appending is the correct top of stack.
     @discardableResult
     mutating func insertOnTop(_ node: CanvasNode) -> UUID {
-        let containerCount = nodes.filter { $0.kind.isContainer }.count
-        return insert(node, at: containerCount)
+        insert(node)
     }
 
     @discardableResult
@@ -88,8 +88,7 @@ public extension CanvasDocument {
         guard !ids.isEmpty else { return }
         let moved = nodes.filter { ids.contains($0.id) }
         nodes.removeAll { ids.contains($0.id) }
-        let containerCount = nodes.filter { $0.kind.isContainer }.count
-        nodes.insert(contentsOf: moved, at: containerCount)
+        nodes.append(contentsOf: moved)
         touch()
     }
 
@@ -347,7 +346,7 @@ public extension CanvasDocument {
         if schemaVersion < 1 {
             schemaVersion = 1
         }
-        if gridSpacing < 8 { gridSpacing = 48 }
+        if gridSpacing < 16 { gridSpacing = 48 }
         if transform.zoom < CanvasTransform.minZoom || transform.zoom > CanvasTransform.maxZoom {
             transform.zoom = 1
         }

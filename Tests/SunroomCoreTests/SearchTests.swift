@@ -21,18 +21,17 @@ final class SearchTests: XCTestCase {
         XCTAssertGreaterThan(wordStart.score, midWord.score)
     }
 
-    func testSeparatorsDoNotGetAWordStartBonusInTheFastPath() {
-        // The substring fast path only accepts a preceding space as a word
-        // boundary (Search.swift:26-29); the non-contiguous path also accepts
-        // "-", "_" and "/" (Search.swift:59). So these score as an ordinary
-        // substring (100 + 10 - offset 2), not the 18-point word-start bonus.
-        for candidate in ["a-room", "a_room", "a/room"] {
+    func testSeparatorsEarnTheWordStartBonusInBothPaths() {
+        // The substring fast path and the scattered path agree: a match that
+        // starts after a separator is a word start (100 + 18 - offset 2).
+        for candidate in ["a room", "a-room", "a_room", "a/room", "a.room"] {
             let match = try! XCTUnwrap(FuzzyMatcher.score(query: "room", candidate: candidate), candidate)
-            XCTAssertEqual(match.score, 108, candidate)
+            XCTAssertEqual(match.score, 116, candidate)
         }
 
-        let spaceSeparated = try! XCTUnwrap(FuzzyMatcher.score(query: "room", candidate: "a room"))
-        XCTAssertEqual(spaceSeparated.score, 116, "A preceding space still earns the bonus")
+        // A match inside a word does not.
+        let midWord = try! XCTUnwrap(FuzzyMatcher.score(query: "oom", candidate: "aroom"))
+        XCTAssertEqual(midWord.score, 108)
     }
 
     func testCamelCaseBoundaryIsRewarded() throws {
@@ -43,12 +42,7 @@ final class SearchTests: XCTestCase {
         let camel = try XCTUnwrap(FuzzyMatcher.score(query: "sc", candidate: "SunroomCanvas"))
         let flat = try XCTUnwrap(FuzzyMatcher.score(query: "sc", candidate: "Sunroomcx"))
 
-        XCTExpectFailure(
-            "Known bug: camel-case boundary bonus is unreachable because the candidate is lowercased first (Search.swift:18,60).",
-            strict: false
-        ) {
-            XCTAssertGreaterThan(camel.score, flat.score)
-        }
+        XCTAssertGreaterThan(camel.score, flat.score)
     }
 
     func testNonMatchingQueryReturnsNil() {

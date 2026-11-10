@@ -39,12 +39,7 @@ final class DocumentOperationsTests: XCTestCase {
 
         XCTAssertEqual(document.nodes.count, 3)
         XCTAssertEqual(ids(of: document), Set(document.nodes.map(\.id)))
-        XCTExpectFailure(
-            "Known bug: insertOnTop inserts at the bottom of the non-container stack (DocumentOperations.swift:28-31).",
-            strict: false
-        ) {
-            XCTAssertEqual(document.nodes.last?.id, top.id)
-        }
+        XCTAssertEqual(document.nodes.last?.id, top.id)
     }
 
     func testInsertOnTopKeepsContainersBehind() {
@@ -235,12 +230,7 @@ final class DocumentOperationsTests: XCTestCase {
         document.bringToFront(ids: [c.id])
 
         XCTAssertEqual(document.nodes.count, 4)
-        XCTExpectFailure(
-            "Known bug: bringToFront inserts at containerCount, i.e. behind every other non-container node (DocumentOperations.swift:87-94).",
-            strict: false
-        ) {
-            XCTAssertEqual(document.nodes.last?.id, c.id)
-        }
+        XCTAssertEqual(document.nodes.last?.id, c.id)
     }
 
     func testBringToFrontPreservesRelativeSelectionOrder() {

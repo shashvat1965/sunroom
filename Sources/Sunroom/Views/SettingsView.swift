@@ -18,14 +18,14 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             header
             TabView {
-                shortcuts
-                    .tabItem { Label("Shortcuts", systemImage: "command") }
                 general
                     .tabItem { Label("General", systemImage: "gearshape") }
                 canvas
                     .tabItem { Label("Canvas", systemImage: "rectangle.on.rectangle") }
                 windows
                     .tabItem { Label("Windows", systemImage: "macwindow") }
+                shortcuts
+                    .tabItem { Label("Shortcuts", systemImage: "command") }
             }
         }
         .background(Color(nsColor: .windowBackgroundColor))
@@ -303,11 +303,9 @@ struct SettingsView: View {
     private static let shortcutRows: [(String, String)] = [
         ("Command palette", "⌘K"),
         ("Pan the canvas", "Space + drag"),
-        ("Fit everything", "⇧⌘F"),
         ("New note", "⌘N"),
         ("Inspector", "⌥⌘I"),
         ("Capture desktop", "⌃⌥C"),
-        ("Undo / redo", "⌘Z / ⇧⌘Z"),
     ]
 }
 

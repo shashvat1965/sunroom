@@ -234,7 +234,7 @@ final class DocumentStoreTests: XCTestCase {
         let loaded = try store.loadCanvas(id: document.id)
 
         XCTAssertEqual(loaded.schemaVersion, CanvasDocument.currentSchemaVersion)
-        XCTAssertEqual(loaded.gridSpacing, 48)
+        XCTAssertEqual(loaded.gridSpacing, 16) // clamped to the minimum at decode time
         XCTAssertEqual(loaded.transform.zoom, 1)
         XCTAssertEqual(loaded.nodes[0].frame, rect(-30, -10, 40, 20))
         XCTAssertEqual(loaded.nodes[0].style.opacity, 1)

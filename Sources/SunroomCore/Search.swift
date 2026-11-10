@@ -8,26 +8,35 @@ public enum FuzzyMatcher {
 
     public struct Match {
         public let score: Int
+        /// Character offsets into the candidate, not String.Index values, so a
+        /// caller can highlight without re-deriving the match.
         public let matchedRanges: [Range<Int>]
     }
 
     public static func score(query: String, candidate: String) -> Match? {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return Match(score: 0, matchedRanges: []) }
+
+        let original = Array(candidate)
+        let lowered = original.map { character -> Character in
+            // Per-character lowercasing keeps the arrays index-aligned, which
+            // string-level lowercasing does not guarantee for all scripts.
+            let loweredString = String(character).lowercased()
+            return loweredString.count == 1 ? loweredString.first! : character
+        }
         let queryChars = Array(trimmed.lowercased())
-        let candidateChars = Array(candidate.lowercased())
-        guard queryChars.count <= candidateChars.count else { return nil }
+
+        guard queryChars.count <= lowered.count else { return nil }
 
         // Fast path: contiguous substring.
-        if let range = candidate.lowercased().range(of: trimmed.lowercased()) {
-            let start = candidate.distance(from: candidate.startIndex, to: range.lowerBound)
+        if let start = firstIndex(of: queryChars, in: lowered) {
             var bonus = 10
-            if start == 0 { bonus = 24 }
-            else if let index = candidate.index(candidate.startIndex, offsetBy: start, limitedBy: candidate.endIndex),
-                    start > 0, candidate[candidate.index(before: index)] == " " {
+            if start == 0 {
+                bonus = 24
+            } else if isBoundary(original, at: start) {
                 bonus = 18
             }
-            return Match(score: 100 + bonus - min(start, 10), matchedRanges: [start..<(start + trimmed.count)])
+            return Match(score: 100 + bonus - min(start, 10), matchedRanges: [start..<(start + queryChars.count)])
         }
 
         var queryIndex = 0
@@ -36,32 +45,37 @@ public enum FuzzyMatcher {
         var ranges: [Range<Int>] = []
         var rangeStart: Int?
 
-        for (index, char) in candidateChars.enumerated() {
+        for (index, character) in lowered.enumerated() {
             guard queryIndex < queryChars.count else { break }
-            if char == queryChars[queryIndex] {
-                if lastMatchIndex == index - 1 {
-                    score += 8
-                    if let start = rangeStart {
-                        ranges[ranges.count - 1] = start..<(index + 1)
-                    } else {
-                        rangeStart = index
-                        ranges.append(index..<(index + 1))
-                    }
+            guard character == queryChars[queryIndex] else { continue }
+
+            if lastMatchIndex == index - 1 {
+                score += 8
+                if let start = rangeStart {
+                    ranges[ranges.count - 1] = start..<(index + 1)
                 } else {
-                    if let start = rangeStart { ranges[ranges.count - 1] = start..<(lastMatchIndex + 1) }
                     rangeStart = index
                     ranges.append(index..<(index + 1))
-                    score += 3
                 }
-                if index == 0 { score += 12 }
-                else {
-                    let previous = candidateChars[index - 1]
-                    if previous == " " || previous == "-" || previous == "_" || previous == "/" { score += 10 }
-                    else if previous.isLowercase && char.isUppercase { score += 6 }
+            } else {
+                if let start = rangeStart, let last = ranges.indices.last {
+                    ranges[last] = start..<(lastMatchIndex + 1)
                 }
-                lastMatchIndex = index
-                queryIndex += 1
+                rangeStart = index
+                ranges.append(index..<(index + 1))
+                score += 3
             }
+
+            if index == 0 {
+                score += 12
+            } else if isBoundary(original, at: index) {
+                score += 10
+            } else if original[index - 1].isLowercase && original[index].isUppercase {
+                score += 6
+            }
+
+            lastMatchIndex = index
+            queryIndex += 1
         }
         guard queryIndex == queryChars.count else { return nil }
         return Match(score: score, matchedRanges: ranges)
@@ -80,6 +94,27 @@ public enum FuzzyMatcher {
                 return key(lhs.0) < key(rhs.0)
             }
             .map(\.0)
+    }
+
+    // MARK: Helpers
+
+    private static func isBoundary(_ characters: [Character], at index: Int) -> Bool {
+        guard index > 0, index < characters.count else { return false }
+        let previous = characters[index - 1]
+        return previous == " " || previous == "-" || previous == "_" || previous == "/" || previous == "."
+    }
+
+    private static func firstIndex(of needle: [Character], in haystack: [Character]) -> Int? {
+        guard !needle.isEmpty, haystack.count >= needle.count else { return nil }
+        for start in 0...(haystack.count - needle.count) {
+            var matches = true
+            for offset in 0..<needle.count where haystack[start + offset] != needle[offset] {
+                matches = false
+                break
+            }
+            if matches { return start }
+        }
+        return nil
     }
 }
 

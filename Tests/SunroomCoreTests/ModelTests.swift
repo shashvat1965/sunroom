@@ -120,12 +120,7 @@ final class ModelTests: XCTestCase {
         object.removeValue(forKey: "notes")
 
         let mutated = try JSONSerialization.data(withJSONObject: object)
-        try XCTExpectFailure(
-            "Known gap: synthesized Codable rejects documents missing a field before migrateIfNeeded() can run.",
-            strict: false
-        ) {
-            XCTAssertNoThrow(try makeDecoder().decode(CanvasDocument.self, from: mutated))
-        }
+        XCTAssertNoThrow(try makeDecoder().decode(CanvasDocument.self, from: mutated))
     }
 
     // MARK: Migration
@@ -163,8 +158,8 @@ final class ModelTests: XCTestCase {
     }
 
     func testDocumentInitClampsGridSpacing() {
-        XCTAssertEqual(makeDocument(gridSpacing: 1).gridSpacing, 8)
-        XCTAssertEqual(makeDocument(gridSpacing: 8).gridSpacing, 8)
+        XCTAssertEqual(makeDocument(gridSpacing: 1).gridSpacing, 16)
+        XCTAssertEqual(makeDocument(gridSpacing: 16).gridSpacing, 16)
         XCTAssertEqual(makeDocument(gridSpacing: 200).gridSpacing, 200)
     }
 

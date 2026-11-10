@@ -21,6 +21,7 @@ struct InspectorView: View {
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.86)) {
                         model.isInspectorPresented = false
+                        model.settings.inspectorVisible = false
                     }
                 } label: {
                     Image(systemName: "xmark")
@@ -216,7 +217,8 @@ private struct MultiInspector: View {
                             .fill(Color.sunroomAccent.opacity(0.22))
                     }
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("\(nodes.count) items selected").font(.system(size: 13, weight: .semibold))
+                    Text("\(nodes.count) item\(nodes.count == 1 ? "" : "s") selected")
+                        .font(.system(size: 13, weight: .semibold))
                     if let bounds = model.selectionBounds {
                         Text("\(Int(bounds.width)) × \(Int(bounds.height))")
                             .font(Theme.Typo.mono())
@@ -250,16 +252,18 @@ private struct MultiInspector: View {
                 VStack(spacing: 6) {
                     HStack(spacing: 6) {
                         Button { model.groupSelection() } label: {
-                            Label("Group", systemImage: "square.on.square").frame(maxWidth: .infinity)
+                            Label("Group", systemImage: "square.on.square")
                         }
                         .buttonStyle(GlassButtonStyle(size: 28))
                         .disabled(nodes.count < 2)
 
                         Button { model.ungroupSelection() } label: {
-                            Label("Ungroup", systemImage: "square.split.2x2").frame(maxWidth: .infinity)
+                            Label("Ungroup", systemImage: "square.split.2x2")
                         }
                         .buttonStyle(GlassButtonStyle(size: 28))
                         .disabled(!hasGroup)
+
+                        Spacer(minLength: 0)
                     }
 
                     Menu {
@@ -305,7 +309,7 @@ private struct MultiInspector: View {
 
     private func distribute(_ title: String, _ icon: String, _ horizontal: Bool) -> some View {
         Button { model.distribute(horizontally: horizontal) } label: {
-            Image(systemName: icon).frame(maxWidth: .infinity)
+            Label(title, systemImage: icon).font(.system(size: 11))
         }
         .buttonStyle(GlassButtonStyle(size: 28))
         .disabled(nodes.count <= 2)
@@ -450,7 +454,7 @@ private struct NodeInspector: View {
                         guard let name = node.imageAssetName else { return }
                         NSWorkspace.shared.activateFileViewerSelecting([model.store.assetURL(for: name)])
                     } label: {
-                        Label("Reveal in Finder", systemImage: "folder").frame(maxWidth: .infinity)
+                        Label("Reveal in Finder", systemImage: "folder")
                     }
                     .buttonStyle(GlassButtonStyle(size: 28))
                     .disabled(node.imageAssetName == nil)
@@ -524,7 +528,7 @@ private struct WindowTools: View {
                     get: { model.settings.capturePreviews },
                     set: { newValue in
                         model.settings.capturePreviews = newValue
-                        if newValue { model.startCapture() }
+                        if newValue { model.startCapture() } else { model.capture.stop() }
                     }
                 ))
                 .toggleStyle(.switch)
@@ -532,12 +536,12 @@ private struct WindowTools: View {
                 .help("Continuously refresh a snapshot of this window")
 
                 Button { model.focusWindow(for: node) } label: {
-                    Label("Focus window", systemImage: "arrow.up.forward.app").frame(maxWidth: .infinity)
+                    Label("Focus window", systemImage: "arrow.up.forward.app")
                 }
                 .buttonStyle(GlassButtonStyle(isProminent: true, size: 28))
 
                 Button { model.sendWindowToCanvasPosition(node) } label: {
-                    Label("Move window here", systemImage: "macwindow.badge.plus").frame(maxWidth: .infinity)
+                    Label("Move window here", systemImage: "macwindow.badge.plus")
                 }
                 .buttonStyle(GlassButtonStyle(size: 28))
                 .help("Arrange the real window to match this card's place on the canvas")
@@ -567,7 +571,7 @@ private struct WindowTools: View {
 
     private func tool(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: icon).font(.system(size: 11)).lineLimit(1).frame(maxWidth: .infinity)
+            Label(title, systemImage: icon).font(.system(size: 11)).lineLimit(1)
         }
         .buttonStyle(GlassButtonStyle(size: 26))
         .help(title)

@@ -19,13 +19,57 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color(nsColor: .windowBackgroundColor)
-            SettingsView(model: model)
-                .frame(width: 580, height: 470)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(color: .black.opacity(0.3), radius: 40, y: 16)
+            backdrop
+
+            VStack(spacing: 0) {
+                ZStack {
+                    if page == 0 {
+                        WelcomePage()
+                            .transition(pageTransition)
+                    } else if page == 1 {
+                        PermissionsPage(model: model, skip: { go(2) })
+                            .transition(pageTransition)
+                    } else {
+                        FirstCanvasPage()
+                            .transition(pageTransition)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, 42)
+                .padding(.top, 34)
+                .padding(.bottom, 6)
+
+                footer
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 24)
+            }
+            .frame(width: 640, height: 520)
+            .background { parallaxBloom }
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .glassPanel(cornerRadius: 28)
+            .overlay {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [.white.opacity(0.5), .white.opacity(0.06)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.8
+                    )
+            }
+            .shadow(color: .black.opacity(0.35), radius: 60, y: 24)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Welcome to Sunroom, page \(page + 1) of 3")
+            .background {
+                Button("") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                    .opacity(0)
+            }
+            .onExitCommand { dismiss() }
         }
         .ignoresSafeArea()
+        .onAppear { model.refreshPermissions() }
     }
 
     // MARK: Backdrop

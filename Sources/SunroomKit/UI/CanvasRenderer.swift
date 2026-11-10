@@ -81,6 +81,9 @@ public final class CanvasRenderer {
             drawContainer(node, camera: camera, options: options)
         }
         for node in document.nodes where !node.kind.isContainer && node.frame.intersects(visible) {
+            // The inline editor replaces the card while it is open, so the card
+            // does not show through behind the text field.
+            if node.id == options.editingNodeID { continue }
             drawNode(node, camera: camera, options: options)
         }
 

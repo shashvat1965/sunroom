@@ -42,12 +42,7 @@ final class SampleCanvasTests: XCTestCase {
         let group = try XCTUnwrap(document.nodes.first { $0.kind == .group })
         let children = document.children(of: group.id)
 
-        XCTExpectFailure(
-            "Known bug: the welcome group frame is 6pt too narrow for its third note (SampleCanvas.swift:44 vs 67).",
-            strict: false
-        ) {
-            XCTAssertTrue(children.allSatisfy { group.frame.encloses($0.frame) })
-        }
+        XCTAssertTrue(children.allSatisfy { group.frame.encloses($0.frame) })
     }
 
     func testWelcomeHeroIsTextual() throws {

@@ -50,6 +50,22 @@ enum SnapshotMode {
         }
         model.isWindowLibraryPresented = false
         NSApp.appearance = nil
+        try? await Task.sleep(nanoseconds: 700_000_000)
+
+        // Search and inline editing, at light appearance.
+        model.isSearchFocused = true
+        model.searchQuery = "win"
+        try? await Task.sleep(nanoseconds: 900_000_000)
+        write(window: window, to: base.appendingPathComponent("search.png"))
+        model.searchQuery = ""
+        model.isSearchFocused = false
+
+        if let note = model.document.nodes.first(where: { $0.kind == .note }) {
+            model.editingNodeID = note.id
+            try? await Task.sleep(nanoseconds: 900_000_000)
+            write(window: window, to: base.appendingPathComponent("editing.png"))
+            model.editingNodeID = nil
+        }
 
         if model.launchOptions.quitsAfterSnapshot {
             try? await Task.sleep(nanoseconds: 400_000_000)
