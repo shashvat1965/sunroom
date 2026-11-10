@@ -1,0 +1,8 @@
+.DS_Store
+.build/
+.swiftpm/
+*.xcodeproj
+DerivedData/
+dist/
+*.app
+Resources/AppIcon.icns
