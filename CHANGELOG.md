@@ -22,16 +22,28 @@ breaking changes to the document schema; those changes always ship with a migrat
 
 ## [0.1.0] - 2026-11-10
 
-The first public foundation release. This version is canvas-first: the document model, geometry, layouts, persistence
-and search are in place. Live window cards and Accessibility-driven window placement are not part of 0.1.0 and are the
-focus of 0.2.
+The first public release. The infinite canvas, live window cards, Accessibility-driven window arrangement, Liquid
+Glass interface and the full keyboard model all ship together.
 
 ### Added
 
+- **Live window cards.** Any window becomes a card on the plane, captured with `SCScreenshotManager` at a capped pixel
+  size and refreshed at most once per second, two captures in flight.
+- **Desktop capture and layout push.** Turn the current desktop into cards laid out like your screens, rearrange them
+  on the canvas, then move the real windows into those positions with an eased Accessibility tween.
+- **Window actions.** Focus, move-to-card, centre, full screen, minimise, close and refresh, from the card's context
+  menu or the inspector.
+- **Liquid Glass interface.** Floating glass sidebar, toolbar, inspector and minimap, with a material fallback on
+  macOS 14 and 15; five canvas backgrounds and a dot/line grid that keeps its density as you zoom.
+- **⌘K command palette** with 47 wired commands, fuzzy ranking, arrow-key navigation and ⌘1–⌘9 shortcuts.
+- **Onboarding** that explains the plane, asks for the two optional permissions in context, and never blocks the canvas.
+- **Settings** for appearance, accent, grid, snapping, capture cadence, launch at login and the global summon hot key.
+- **Snapshot mode** (`--snapshot <dir>`) and a headless `SunroomRender` executable used for documentation and visual
+  review.
 - **Infinite canvas document model.** Unbounded canvas space, stable node identity, creation and update timestamps, and
   a versioned `CanvasDocument` that encodes to readable JSON.
-- **Node types** for notes, text cards, images, links, frames, shapes, and window references. Frames paint behind their
-  contents; window nodes reserve the reference model used by the upcoming capture pipeline.
+- **Node types** for notes, text cards, images, links, frames, shapes, and live window cards. Frames paint behind their
+  contents; window cards store a stable reference to a real macOS window.
 - **Camera transform** with the `screen = canvas × zoom + translation` mapping, anchor-preserving zoom, fit-all and
   fit-selection, centring, pixel alignment, and log-space interpolation for camera animations.
 - **Uniform spatial index** with 512-point cells for viewport culling and hit-testing, including a guard against
@@ -55,7 +67,8 @@ focus of 0.2.
 - **Colour tokens** stored by name rather than hex, so themes and accessibility passes do not require a document
   migration.
 - **Sample canvas** for first launch and previews.
-- **Test target** wired into CI with a smoke test; the Core suite is being expanded with each change.
+- **285 headless tests** across geometry, transform, spatial index, snapping, document operations, undo, persistence,
+  layout, search and the sample canvas.
 - **MIT licence.**
 
 ### Security

@@ -18,14 +18,14 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             header
             TabView {
-                windows
-                    .tabItem { Label("Windows", systemImage: "macwindow") }
+                shortcuts
+                    .tabItem { Label("Shortcuts", systemImage: "command") }
                 general
                     .tabItem { Label("General", systemImage: "gearshape") }
                 canvas
                     .tabItem { Label("Canvas", systemImage: "rectangle.on.rectangle") }
-                shortcuts
-                    .tabItem { Label("Shortcuts", systemImage: "command") }
+                windows
+                    .tabItem { Label("Windows", systemImage: "macwindow") }
             }
         }
         .background(Color(nsColor: .windowBackgroundColor))
@@ -155,8 +155,6 @@ struct SettingsView: View {
                         .font(Theme.Typo.row())
                         .monospacedDigit()
                 }
-
-                Toggle("Show the grid", isOn: $model.settings.showGrid)
             }
 
             Section("Snapping") {
@@ -173,10 +171,9 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.segmented)
 
-                Text("Applied to \(model.document.name) right away. Grid and background travel with the canvas file.")
+                Text("Applied to this canvas. Grid and background travel with the file.")
                     .font(.system(size: 10.5))
                     .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .formStyle(.grouped)
@@ -218,39 +215,36 @@ struct SettingsView: View {
         Form {
             Section("Live previews") {
                 Toggle("Capture window previews", isOn: $model.settings.capturePreviews)
-                LabeledContent("Capture interval") {
+                HStack(spacing: 10) {
+                    Text("Interval")
+                    Slider(value: $model.settings.captureInterval, in: 0.5...4, step: 0.5)
+                        .tint(.sunroomAccent)
                     Text(String(format: "%.1f s", model.settings.captureInterval))
                         .font(Theme.Typo.mono())
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
+                        .frame(width: 38, alignment: .trailing)
                 }
-                Slider(value: $model.settings.captureInterval, in: 0.5...4, step: 0.5)
-                    .tint(.sunroomAccent)
-                Text("Shorter intervals feel more live and use a little more CPU.")
-                    .font(.system(size: 10.5))
-                    .foregroundStyle(.secondary)
             }
             .onChange(of: model.settings.capturePreviews) { _, enabled in
                 if enabled { model.startCapture() } else { model.capture.stop() }
             }
 
-            Section("Permissions") {
+            Section {
                 ForEach(PermissionKind.allCases, id: \.rawValue) { kind in
                     PermissionRow(model: model, kind: kind)
                 }
-            }
-
-            Section {
                 Button {
                     model.captureDesktop()
                 } label: {
                     Label("Capture desktop now", systemImage: "square.on.square.dashed")
                 }
                 .disabled(!model.hasAccessibility)
-
-                Text("Windows are read locally through the Accessibility and ScreenCaptureKit APIs. Previews stay in memory on this Mac — Sunroom has no accounts, analytics, or servers.")
+            } header: {
+                Text("Permissions")
+            } footer: {
+                Text("Windows are read locally through the Accessibility and ScreenCaptureKit APIs. Previews stay in memory on this Mac — no accounts, no analytics, no servers.")
                     .font(.system(size: 10.5))
-                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
