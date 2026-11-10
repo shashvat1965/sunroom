@@ -1,5 +1,7 @@
 import AppKit
 import SwiftUI
+import SunroomCore
+import SunroomKit
 
 /// Headless-ish screenshot mode used for documentation.
 ///
@@ -72,6 +74,46 @@ enum SnapshotMode {
             try? await Task.sleep(nanoseconds: 400_000_000)
             NSApp.terminate(nil)
         }
+    }
+
+    // MARK: - Canvas mode capture
+
+    /// Enters canvas mode, captures the actual screen (needs Screen Recording),
+    /// dives into one window, captures again, then restores the desktop.
+    static func captureCanvasMode(model: AppModel, directory: String) async {
+        let base = URL(fileURLWithPath: directory, isDirectory: true)
+        try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+
+        model.toggleCanvasMode()
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
+        await captureScreen(to: base.appendingPathComponent("canvas-mode.png"), label: "canvas")
+
+        if let first = model.canvasMode.windows.first {
+            model.canvasMode.selection = first.id
+            model.canvasMode.dive(into: first.id)
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            await captureScreen(to: base.appendingPathComponent("canvas-focused.png"), label: "focused")
+            model.canvasMode.surface()
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            await captureScreen(to: base.appendingPathComponent("canvas-back.png"), label: "back")
+        }
+
+        model.canvasMode.exit()
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        await captureScreen(to: base.appendingPathComponent("canvas-restored.png"), label: "restored")
+    }
+
+    private static func captureScreen(to url: URL, label: String) async {
+        let capture = WindowCaptureService()
+        guard let image = await capture.captureFullScreen(display: nil),
+              let tiff = image.tiffRepresentation,
+              let rep = NSBitmapImageRep(data: tiff),
+              let png = rep.representation(using: .png, properties: [:]) else {
+            print("canvas shot \(label): failed (Screen Recording not granted?)")
+            return
+        }
+        try? png.write(to: url)
+        print("canvas shot \(label): \(url.path) (\(png.count / 1024) KB)")
     }
 
     private static func resize(_ window: NSWindow, to size: NSSize) {

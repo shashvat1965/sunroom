@@ -87,6 +87,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     model.toggleCanvasMode()
                 }
             }
+            if let index = ProcessInfo.processInfo.arguments.firstIndex(of: "--canvas-shot"),
+               ProcessInfo.processInfo.arguments.count > index + 1 {
+                let directory = ProcessInfo.processInfo.arguments[index + 1]
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    await SnapshotMode.captureCanvasMode(model: model, directory: directory)
+                    if ProcessInfo.processInfo.arguments.contains("--quit-after-snapshot") {
+                        NSApp.terminate(nil)
+                    }
+                }
+            }
+            if ProcessInfo.processInfo.arguments.contains("--request-permissions") {
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 800_000_000)
+                    model.requestPermission(.accessibility)
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    model.requestPermission(.screenRecording)
+                }
+            }
             if model.launchOptions.snapshotDirectory != nil {
                 Task { @MainActor in
                     // The main window is created by SwiftUI shortly after this.

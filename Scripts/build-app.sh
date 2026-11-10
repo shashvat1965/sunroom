@@ -65,10 +65,30 @@ CFBundleName = "$APP_NAME";
 CFBundleDisplayName = "$APP_NAME";
 EOF
 
-echo "==> Signing (ad-hoc)"
-codesign --force --deep --sign - --timestamp=none "$APP" >/dev/null 2>&1 || {
-  echo "    codesign failed; the app will still run, but permissions may not stick." >&2
-}
+# A stable signing identity matters: TCC pins permissions to the code
+# signature, and an ad-hoc signature is pinned to a hash that changes on every
+# build. The project uses a local, self-signed identity (no Apple Developer
+# team, no organisation, nothing leaves the machine):
+#
+#   ./Scripts/setup-local-signing.sh    # once
+#   SUNROOM_SIGN_IDENTITY="..." ./Scripts/build-app.sh   # override
+#
+LOCAL_IDENTITY="Sunroom Local Signing"
+LOCAL_KEYCHAIN="$HOME/Library/Keychains/SunroomLocal.keychain-db"
+IDENTITY="${SUNROOM_SIGN_IDENTITY:-$LOCAL_IDENTITY}"
+
+if [ -f "$LOCAL_KEYCHAIN" ]; then
+  security unlock-keychain -p "sunroom-local" "$LOCAL_KEYCHAIN" >/dev/null 2>&1 || true
+fi
+
+if security find-identity -p codesigning "$LOCAL_KEYCHAIN" 2>/dev/null | grep -q "$IDENTITY"; then
+  echo "==> Signing with local identity: $IDENTITY"
+  codesign --force --deep --sign "$IDENTITY" --keychain "$LOCAL_KEYCHAIN" --timestamp=none "$APP" >/dev/null 2>&1 \
+    || echo "    signing failed; run Scripts/setup-local-signing.sh" >&2
+else
+  echo "==> Signing ad-hoc (run Scripts/setup-local-signing.sh to keep TCC grants across rebuilds)"
+  codesign --force --deep --sign - --timestamp=none "$APP" >/dev/null 2>&1 || true
+fi
 
 # Refresh Launch Services so the icon and document types appear immediately.
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP" >/dev/null 2>&1 || true
