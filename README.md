@@ -13,7 +13,7 @@
   <a href="https://github.com/shashvat1965/sunroom/actions/workflows/ci.yml"><img alt="Build status" src="https://github.com/shashvat1965/sunroom/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
-![Sunroom: live window cards, notes and images on one pannable canvas](docs/images/hero.png)
+![Sunroom: live window cards, notes and images on one pannable canvas](docs/images/hero.jpg)
 
 > **Project status:** 0.1, usable daily. The canvas engine, window capture, Accessibility-based window arrangement,
 > persistence, snapping, layouts, undo and search are implemented, with a headless Core test target that CI runs.
@@ -181,25 +181,33 @@ as a notes-and-images canvas; nothing else changes.
 
 ## Screenshots
 
-![The Sunroom window: glass sidebar, floating toolbar, canvas with notes and a live window card](docs/images/canvas-light.png)
+![The Sunroom window: glass sidebar, floating toolbar, canvas with notes and a live window card](docs/images/canvas-light.jpg)
 
 *The main window. Everything floats over the canvas: the sidebar, the tool bar, the minimap. Nothing is a hard edge.*
 
-![The same canvas in dark mode](docs/images/canvas-dark.png)
+![The same canvas in dark mode](docs/images/canvas-dark.jpg)
 
 *Dark mode. Window cards mirror the real window; the note colours become tinted glass instead of solid paper.*
 
-![The command palette open over the canvas](docs/images/palette.png)
+![The command palette open over the canvas](docs/images/palette.jpg)
 
 *⌘K searches commands and objects with the same fuzzy matcher. Titles rank above body text.*
 
-![The inspector editing a frame's position, size and colour](docs/images/inspector.png)
+![The inspector editing a frame's position, size and colour](docs/images/inspector.jpg)
 
 *The inspector is contextual: position, size, colour, corner radius and per-kind actions for the selection.*
 
-![The window library listing every window on the Mac](docs/images/windows.png)
+![The window library listing every window on the Mac](docs/images/windows.jpg)
 
 *Every manageable window on the Mac, grouped by app, with a one-click Add and a Capture-desktop shortcut.*
+
+![Inline editing on the canvas](docs/images/editing.jpg)
+
+*Double-click to edit in place. The card becomes the editor; ⌘Z treats the whole edit as one step.*
+
+![Type-to-find dimming everything that does not match](docs/images/search.jpg)
+
+*Start typing anywhere to search. Everything that does not match recedes, and Return flies to the best match.*
 
 ## Architecture
 

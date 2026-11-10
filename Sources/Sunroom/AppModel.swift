@@ -147,7 +147,7 @@ public final class AppModel: ObservableObject {
 
         if loaded.isEmpty {
             persist(force: true)
-            isOnboardingPresented = launchOptions.showsOnboarding
+            isOnboardingPresented = true
         }
 
         refreshPermissions()
@@ -748,7 +748,9 @@ public final class AppModel: ObservableObject {
     public func requestPermission(_ kind: PermissionKind) {
         PermissionsCenter.shared.request(kind)
         refreshPermissions()
-        if permissionStatus[kind] == .denied {
+        if permissionStatus[kind] == .granted {
+            if kind == .screenRecording { startCapture() }
+        } else {
             PermissionsCenter.shared.openSystemSettings(for: kind)
         }
     }
@@ -759,6 +761,23 @@ public final class AppModel: ObservableObject {
         Task { [weak self] in
             guard let self else { return }
             await self.capture.start()
+            self.refreshWindows()
+        }
+    }
+
+    /// Called from the UI when the user explicitly asks for previews, so the
+    /// system prompt appears in context rather than at launch.
+    public func enablePreviews() {
+        Task { [weak self] in
+            guard let self else { return }
+            let granted = await self.capture.requestPermissionAndStart()
+            self.refreshPermissions()
+            if granted {
+                self.settings.capturePreviews = true
+                self.refreshWindows()
+            } else {
+                PermissionsCenter.shared.openSystemSettings(for: .screenRecording)
+            }
         }
     }
 

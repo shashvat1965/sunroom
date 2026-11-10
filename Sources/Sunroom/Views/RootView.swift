@@ -120,6 +120,7 @@ public struct RootView: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 model.performInitialFitIfNeeded()
+                model.startCapture()
             }
         }
         .background(GeometryReader { proxy in

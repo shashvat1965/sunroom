@@ -39,6 +39,7 @@ enum SnapshotMode {
         write(window: window, to: base.appendingPathComponent("onboarding.png"))
         model.isOnboardingPresented = false
 
+        model.selection = []
         NSApp.appearance = NSAppearance(named: .darkAqua)
         try? await Task.sleep(nanoseconds: 900_000_000)
         write(window: window, to: base.appendingPathComponent("canvas-dark.png"))

@@ -51,10 +51,9 @@ moderation decisions when appropriate.
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the project maintainer at
-**conduct@sunroom.app**. This address is a placeholder until the project's public launch; if it does not reach a human,
-open a confidential report through GitHub's [private vulnerability reporting](https://github.com/shashvat1965/sunroom/security/advisories/new)
-and ask for it to be forwarded to the maintainer.
+Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported privately to the maintainer at
+[@shashvat1965](https://github.com/shashvat1965). If that does not reach a human, open a minimal public issue asking for
+a private channel and wait for a reply before sharing details.
 
 All complaints will be reviewed and investigated promptly and fairly.
 

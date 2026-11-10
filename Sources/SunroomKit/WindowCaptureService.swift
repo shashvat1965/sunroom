@@ -36,24 +36,33 @@ public final class WindowCaptureService {
 
     // MARK: Lifecycle
 
+    /// Starts capture only when permission is already granted. Never prompts:
+    /// a first launch must not throw a system dialog at someone who has not
+    /// asked for previews yet.
     public func start() async {
-        guard await requestAccess() else { return }
+        guard CGPreflightScreenCaptureAccess() else {
+            hasAccess = false
+            return
+        }
+        hasAccess = true
         await refreshShareableContent()
         startRefreshLoop()
+    }
+
+    /// Explicitly asks for Screen Recording, then starts if it was granted.
+    @discardableResult
+    public func requestPermissionAndStart() async -> Bool {
+        let granted = CGPreflightScreenCaptureAccess() || CGRequestScreenCaptureAccess()
+        hasAccess = granted
+        guard granted else { return false }
+        await refreshShareableContent()
+        startRefreshLoop()
+        return true
     }
 
     public func stop() {
         refreshTask?.cancel()
         refreshTask = nil
-    }
-
-    private func requestAccess() async -> Bool {
-        if CGPreflightScreenCaptureAccess() {
-            hasAccess = true
-            return true
-        }
-        hasAccess = CGRequestScreenCaptureAccess()
-        return hasAccess
     }
 
     /// Cache the shareable content so per-window captures do not enumerate the

@@ -24,9 +24,8 @@ Use GitHub's private vulnerability reporting:
 2. Describe the issue, the affected version or commit, and the impact.
 3. Include reproduction steps and, if possible, a minimal proof of concept.
 
-If GitHub's private reporting is unavailable, email **security@sunroom.app** with the same information. That address is
-a placeholder until public launch; if it does not reach a human, open a normal issue that says only "I need a private
-security contact" and wait for a reply before sharing details.
+If GitHub's private reporting is unavailable, open a minimal public issue asking for a private channel and a maintainer
+will reply with one. Do not include exploit details in that issue.
 
 What to expect:
 
