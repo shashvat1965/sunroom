@@ -7,75 +7,91 @@ public enum SampleCanvas {
     public static func welcome() -> CanvasDocument {
         var document = CanvasDocument(name: "Welcome to Sunroom", background: .aurora, gridStyle: .dots)
 
-        var hero = CanvasNode(
+        let hero = CanvasNode(
             kind: .text,
-            frame: CanvasRect(x: -520, y: -380, width: 640, height: 220),
+            frame: CanvasRect(x: -640, y: -430, width: 660, height: 156),
             title: "Sunroom",
-            text: """
-            An infinite canvas for your Mac.
-
-            Pan, zoom, and arrange windows, notes and images on one endless plane.
-            Press ⌘K to search. Hold space to drag the world.
-            """,
-            style: NodeStyle(accent: ColorToken.sunflower.rawValue, fontSize: 17, cornerRadius: 26)
+            text: "An infinite canvas for your Mac.\nWindows, notes and images on one endless plane.",
+            style: NodeStyle(accent: ColorToken.sunflower.rawValue, fontSize: 16, cornerRadius: 24)
         )
-        hero.isLocked = true
 
-        var stickyStart = CanvasNode(
+        let link = CanvasNode(
+            kind: .link,
+            frame: CanvasRect(x: -640, y: -216, width: 660, height: 92),
+            title: "github.com/shashvat1965/sunroom",
+            text: "https://github.com/shashvat1965/sunroom",
+            style: NodeStyle(accent: ColorToken.sky.rawValue, cornerRadius: 16),
+            linkURL: "https://github.com/shashvat1965/sunroom"
+        )
+
+        let window = CanvasNode(
+            kind: .window,
+            frame: CanvasRect(x: 400, y: -430, width: 380, height: 306),
+            title: "Design notes — Safari",
+            text: "Safari",
+            style: NodeStyle(accent: ColorToken.slate.rawValue, cornerRadius: 12),
+            windowReference: WindowReference(
+                windowNumber: 0,
+                ownerPID: 0,
+                bundleIdentifier: "com.apple.Safari",
+                appName: "Safari",
+                windowTitle: "Design notes"
+            )
+        )
+
+        let frame = CanvasNode(
+            kind: .group,
+            frame: CanvasRect(x: -660, y: -70, width: 1040, height: 244),
+            title: "A little tour",
+            style: NodeStyle(accent: ColorToken.slate.rawValue, cornerRadius: 26)
+        )
+
+        let stickyStart = CanvasNode(
             kind: .note,
-            frame: CanvasRect(x: -520, y: -104, width: 300, height: 240),
+            frame: CanvasRect(x: -622, y: -10, width: 316, height: 170),
             title: "Start here",
-            text: "Double-click to edit.\nDrag to move. ⌘⏎ to commit.\n⇧⌘F fits everything.",
+            text: "Double-click to edit.\nDrag to move.\n⇧⌘F fits everything.",
             style: NodeStyle(accent: ColorToken.apricot.rawValue, fontSize: 15)
         )
-        stickyStart.isLocked = false
 
-        var stickyWindows = CanvasNode(
+        let stickyWindows = CanvasNode(
             kind: .note,
-            frame: CanvasRect(x: -190, y: -104, width: 300, height: 240),
-            title: "Windows, on the canvas",
-            text: "Open the Windows panel, then drag any window onto the plane. Click a card to fly the real window to it.",
+            frame: CanvasRect(x: -276, y: -10, width: 316, height: 170),
+            title: "Windows",
+            text: "Drag a window onto the plane.\nClick a card to fly to it.\nCards stay live.",
             style: NodeStyle(accent: ColorToken.sky.rawValue, fontSize: 15)
         )
 
-        var stickyKeys = CanvasNode(
+        let stickyKeys = CanvasNode(
             kind: .note,
-            frame: CanvasRect(x: 140, y: -104, width: 300, height: 240),
-            title: "Keyboard first",
-            text: "Space + drag to pan\n⌘= / ⌘− to zoom\n⌘0 to reset\n⌘K command palette\n⌘⇧N new note",
+            frame: CanvasRect(x: 70, y: -10, width: 316, height: 170),
+            title: "Keys",
+            text: "Space + drag to pan\n⌘= / ⌘− to zoom\n⌘K for commands",
             style: NodeStyle(accent: ColorToken.mint.rawValue, fontSize: 15)
         )
 
-        var frame = CanvasNode(
-            kind: .group,
-            frame: CanvasRect(x: -560, y: -140, width: 1040, height: 320),
-            title: "A little tour",
-            style: NodeStyle(accent: ColorToken.slate.rawValue, cornerRadius: 28)
-        )
-
-        var footer = CanvasNode(
+        let footer = CanvasNode(
             kind: .text,
-            frame: CanvasRect(x: -520, y: 240, width: 640, height: 90),
+            frame: CanvasRect(x: -640, y: 224, width: 660, height: 68),
             title: "",
-            text: "Sunroom is open source. Nothing leaves your Mac.",
-            style: NodeStyle(accent: ColorToken.slate.rawValue, fontSize: 13, cornerRadius: 18, opacity: 0.85)
+            text: "Open source. Local-first. Nothing leaves your Mac.",
+            style: NodeStyle(accent: ColorToken.slate.rawValue, fontSize: 13, cornerRadius: 16, opacity: 0.9)
         )
 
         document.insert(frame, at: 0)
         document.insert(hero)
+        document.insert(link)
+        document.insert(window)
         document.insert(footer)
         document.insert(stickyStart)
         document.insert(stickyWindows)
         document.insert(stickyKeys)
 
-        stickyStart.groupID = frame.id
-        stickyWindows.groupID = frame.id
-        stickyKeys.groupID = frame.id
-        if let index = document.index(of: stickyStart.id) { document.nodes[index] = stickyStart }
-        if let index = document.index(of: stickyWindows.id) { document.nodes[index] = stickyWindows }
-        if let index = document.index(of: stickyKeys.id) { document.nodes[index] = stickyKeys }
+        for id in [stickyStart.id, stickyWindows.id, stickyKeys.id] {
+            if let index = document.index(of: id) { document.nodes[index].groupID = frame.id }
+        }
 
-        document.transform = CanvasTransform(translation: CanvasPoint(x: 720, y: 460), zoom: 1)
+        document.transform = CanvasTransform(translation: CanvasPoint(x: 820, y: 520), zoom: 1)
         return document
     }
 

@@ -26,6 +26,11 @@ let package = Package(
             dependencies: ["SunroomCore", "SunroomKit"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
+        .executableTarget(
+            name: "SunroomRender",
+            dependencies: ["SunroomCore", "SunroomKit"],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
         .testTarget(
             name: "SunroomCoreTests",
             dependencies: ["SunroomCore"],

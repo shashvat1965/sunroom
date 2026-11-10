@@ -60,6 +60,9 @@ public final class DocumentFileStore {
     private let fileManager = FileManager.default
     private let maxBackupsPerCanvas = 5
 
+    /// The app-wide store, used by image loading caches.
+    public static let defaultStore = DocumentFileStore()
+
     public init(location: StorageLocation = .applicationSupport()) {
         self.location = location
         let encoder = JSONEncoder()

@@ -170,7 +170,7 @@ public struct CanvasNode: Codable, Identifiable, Hashable, Sendable {
     public var displayLabel: String {
         if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return title }
         if let reference = windowReference { return reference.windowTitle.isEmpty ? reference.appName : reference.windowTitle }
-        if let linkURL, let url = URL(string: linkURL) { return url.host ?? linkURL }
+        if let linkURL, let url = URL(string: linkURL), let host = url.host, !host.isEmpty { return host }
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? kind.displayName : String(trimmed.prefix(60))
     }

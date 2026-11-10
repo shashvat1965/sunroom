@@ -119,6 +119,7 @@ public struct CanvasTransform: Codable, Hashable, Sendable {
 
     /// Rounds translation to whole pixels to keep text crisp at rest.
     public func pixelAligned(scale: Double = 2) -> CanvasTransform {
+        guard scale > 0 else { return self }
         var copy = self
         copy.translation = translation.rounded(to: 1 / scale)
         return copy

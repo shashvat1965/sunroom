@@ -161,12 +161,14 @@ public extension CanvasDocument {
             guard let index = index(of: node.id) else { continue }
             var frame = node.frame
             switch alignment {
-            case .left: frame = frame.withMinX(target.minX)
+            // Alignment moves objects; it must never resize them. (Using the
+            // edge-setting helpers here would stretch the node instead.)
+            case .left: frame = frame.offsetBy(dx: target.minX - frame.minX, dy: 0)
             case .centerHorizontal: frame = frame.offsetBy(dx: target.center.x - frame.center.x, dy: 0)
-            case .right: frame = frame.withMaxX(target.maxX)
-            case .top: frame = frame.withMinY(target.minY)
+            case .right: frame = frame.offsetBy(dx: target.maxX - frame.maxX, dy: 0)
+            case .top: frame = frame.offsetBy(dx: 0, dy: target.minY - frame.minY)
             case .centerVertical: frame = frame.offsetBy(dx: 0, dy: target.center.y - frame.center.y)
-            case .bottom: frame = frame.withMaxY(target.maxY)
+            case .bottom: frame = frame.offsetBy(dx: 0, dy: target.maxY - frame.maxY)
             }
             nodes[index].frame = frame
             nodes[index].touch()

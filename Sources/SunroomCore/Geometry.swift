@@ -135,9 +135,9 @@ public struct CanvasRect: Codable, Hashable, Sendable {
         CanvasRect(x: minX, y: minY, width: width, height: height)
     }
 
-    public var isEmpty: Bool { width <= 0 || height <= 0 }
+    public var isEmpty: Bool { size.width <= 0 || size.height <= 0 }
 
-    public var area: Double { width * height }
+    public var area: Double { isEmpty ? 0 : width * height }
 
     public func contains(_ point: CanvasPoint) -> Bool {
         point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY
