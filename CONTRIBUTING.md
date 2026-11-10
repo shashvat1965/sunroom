@@ -215,3 +215,9 @@ Mention the accessibility work in the pull request, even when it is just "labels
 
 Open a discussion or an issue with the `question` label. If you are unsure whether a change fits, ask before writing a
 large patch; a short design note in an issue is cheaper for everyone than a rejected pull request.
+
+## Quality
+
+See [docs/QA.md](docs/QA.md) for the current verification matrix: what the automated suite covers, what was checked
+by hand on the last release, and what is still unverified. A pull request that changes behaviour should either extend the
+suite or add a line to that document explaining how it was verified.

@@ -10,7 +10,6 @@
   <a href="#requirements"><img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-1b1d22?logo=apple&logoColor=white"></a>
   <a href="https://swift.org"><img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-4f7d63.svg"></a>
-  <a href="https://github.com/shashvat1965/sunroom/actions/workflows/ci.yml"><img alt="Build status" src="https://github.com/shashvat1965/sunroom/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 ![Sunroom: live window cards, notes and images on one pannable canvas](docs/images/hero.jpg)
@@ -239,6 +238,7 @@ SunroomKit talks to the window server.
 
 Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the coordinate spaces, transform invariants, spatial index sizing,
 level-of-detail thresholds, capture cadence, Accessibility batching, and the on-disk format.
+[docs/QA.md](docs/QA.md) records what has actually been verified, and what has not.
 
 ## Roadmap
 
